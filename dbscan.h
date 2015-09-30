@@ -1,4 +1,5 @@
 #include <vector>
+#include <map>
 #include <string>
 #include <boost/numeric/ublas/matrix.hpp>
 
@@ -11,6 +12,7 @@ namespace clustering {
 		typedef ublas::matrix<double> ClusterData;
 		typedef std::vector<uint32_t> Neighbors;
 		typedef std::vector<int32_t> Labels;
+		typedef std::map<int32_t, std::vector<uint32_t>> ClusterMap;
 
 		DBSCAN(double eps, size_t minPts, int num_threads=1);
 		DBSCAN();
@@ -20,6 +22,10 @@ namespace clustering {
 		ClusterData read_file( std::string &file_name, char delimiter );
 		void dbscan( ClusterData & C );
 		const Labels & get_labels() const;
+		ClusterMap gen_cluster_map();
+		void print_cluster_stat(ClusterMap & cmap);
+		int32_t get_max_cluster(ClusterMap & cmap);
+		void write_max_cluster(int32_t id, std::string & file_name, std::ostream & o);
 	
 	private:
 		void init_labels( size_t s );

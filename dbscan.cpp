@@ -13,7 +13,7 @@
 
 namespace clustering {
 
-	DBSCAN::ClusterData DBSCAN::read_file( std::string &file_name, char delimiter ) {
+	DBSCAN::ClusterData DBSCAN::read_file( std::string & file_name, char delimiter ) {
 		size_t features_num = 0, elements_num = 0;
 		std::ifstream stream(file_name.c_str());
 		std::string line, field;
@@ -149,6 +149,57 @@ namespace clustering {
 
 	const DBSCAN::Labels & DBSCAN::get_labels() const {
 		return cluster_labels;
+	}
+
+	DBSCAN::ClusterMap DBSCAN::gen_cluster_map() {
+		uint32_t row = cluster_labels.size();
+		DBSCAN::ClusterMap cmap;
+		DBSCAN::ClusterMap::iterator iter;
+		for ( uint32_t i=0; i<row; i++ ) {
+			iter = cmap.find(cluster_labels[i]);
+			if (iter == cmap.end()) {
+				std::vector<uint32_t> value(1, i);
+				cmap.insert(std::make_pair(cluster_labels[i], value));
+			} else {
+				iter->second.push_back(i);
+			}
+		}
+		return cmap;
+	}
+
+	void DBSCAN::print_cluster_stat(DBSCAN::ClusterMap & cmap) {
+		DBSCAN::ClusterMap::iterator iter;
+		for (iter=cmap.begin(); iter!=cmap.end(); iter++) {
+			std::cout<<"key:"<<iter->first<<" value:"<<iter->second.size()<<std::endl;
+		}
+	}
+
+	int32_t DBSCAN::get_max_cluster(DBSCAN::ClusterMap & cmap) {
+		DBSCAN::ClusterMap::iterator iter;
+		int32_t kmax = 0;
+		uint32_t vmax = 0;
+		for (iter=cmap.begin(); iter!=cmap.end(); iter++) {
+			if (iter->second.size() > vmax) {
+				vmax = iter->second.size();
+				kmax = iter->first;
+			}
+		}
+		std::cout<<"max cluster (key:"<<kmax<<" value:"<<vmax<<")"<<std::endl;
+		return kmax;
+	}
+
+	void DBSCAN::write_max_cluster(int32_t id, std::string & file_name, std::ostream & o) {
+		std::ifstream stream(file_name.c_str());
+		std::string line;
+		size_t cnt = 0;
+		while(stream){
+			std::getline(stream, line);
+			if(line == "") continue;
+			if(cluster_labels[cnt] == id){
+				o << line << std::endl;
+			}
+			cnt ++;
+		}
 	}
 
 	std::ostream& operator<<( std::ostream& o, DBSCAN & d ) {
