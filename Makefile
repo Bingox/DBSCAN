@@ -15,4 +15,4 @@ all: filter_dbscan
 
 .PHONY : clean
 clean:
-	-rm filter_dbscan *.o *.d
+	-rm filter_dbscan *.d $(OBJ)
