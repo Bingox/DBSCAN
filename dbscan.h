@@ -20,7 +20,8 @@ namespace clustering {
 
 		void reset();
 		ClusterData read_file( std::string &file_name, char delimiter );
-		void dbscan( ClusterData & C );
+		void normalize( ClusterData & C, std::vector<uint32_t> & selected_features );
+		void dbscan( ClusterData & C, std::vector<double> & weights );
 		const Labels & get_labels() const;
 		ClusterMap gen_cluster_map();
 		void print_cluster_stat(ClusterMap & cmap);
@@ -29,11 +30,16 @@ namespace clustering {
 	
 	private:
 		void init_labels( size_t s );
-		Neighbors find_neighbors( ClusterData & C, uint32_t pts);
-		void expand_cluster( ClusterData & C, Neighbors & ne, uint32_t cluster_id );
+		Neighbors find_neighbors( ClusterData & C, uint32_t pts, std::vector<double> & weights );
+		void expand_cluster( ClusterData & C, Neighbors & ne, uint32_t cluster_id, std::vector<double> & weights );
 		double m_eps;
 		size_t m_minPts;
 		int m_num_threads;
+
+		std::vector<double> data_min;
+		std::vector<double> data_max;
+		std::vector<double> data_mid;
+		std::vector<double> data_ranges;
 
 		const int32_t UNCLASSIFIED = -1;
 		const int32_t NOISE = -2;

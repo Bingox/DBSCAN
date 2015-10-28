@@ -19,7 +19,12 @@ int main(int argc, char** argv) {
 
 	DBSCAN dbs(eps, minPts, numThreads);
 	DBSCAN::ClusterData data = dbs.read_file(file_name, ',');
-	dbs.dbscan( data );
+
+	std::vector<uint32_t> v_selected_normalize(data.size2(), 1);
+	dbs.normalize( data, v_selected_normalize );
+
+	std::vector<double> weights(data.size2(), 1);
+	dbs.dbscan(data, weights);
 	DBSCAN::ClusterMap cmap = dbs.gen_cluster_map();
 	dbs.print_cluster_stat(cmap);
 	max_cluster_id = dbs.get_max_cluster(cmap);
